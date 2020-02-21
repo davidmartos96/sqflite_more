@@ -337,6 +337,9 @@ extension SqfliteFfiMethodCallHandler on FfiMethodCall {
       throw wrapSqlException(e, code: 'open_failed');
     }
 
+    String password = arguments['password'] ?? '';
+    ffiDb.execute('PRAGMA KEY = "$password"');
+
     var id = ++_lastFfiId;
     var database = SqfliteFfiDatabase(id, ffiDb,
         singleInstance: singleInstance,

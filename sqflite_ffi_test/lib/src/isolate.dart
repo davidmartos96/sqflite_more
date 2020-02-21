@@ -1,6 +1,8 @@
 import 'dart:isolate';
 
 import 'package:meta/meta.dart';
+import 'package:moor_ffi/open_helper.dart';
+import 'package:sqflite_ffi_test/sqflite_ffi_test.dart';
 import 'package:sqflite_ffi_test/src/import.dart';
 import 'package:sqflite_ffi_test/src/method_call.dart';
 import 'package:sqflite_ffi_test/src/sqflite_ffi_exception.dart';
@@ -49,7 +51,8 @@ Future<SqfliteIsolate> createIsolate() async {
   var ourFirstReceivePort = ReceivePort();
 
   // spawn the isolate with an initial sendPort.
-  await Isolate.spawn(_isolate, ourFirstReceivePort.sendPort);
+  await Isolate.spawn(_isolate,
+      _StartIsolate(ourFirstReceivePort.sendPort, openLibraryOverride));
 
   // the isolate sends us its SendPort as its first message.
   // this lets us communicate with it. we’ll always use this port to
@@ -60,7 +63,12 @@ Future<SqfliteIsolate> createIsolate() async {
 }
 
 /// The isolate
-Future _isolate(SendPort sendPort) async {
+Future _isolate(_StartIsolate startIsolate) async {
+  final sendPort = startIsolate.sendPort;
+  if (startIsolate.openLibrary != null) {
+    open.overrideForAll(startIsolate.openLibrary);
+  }
+
   // open our receive port. this is like turning on
   // our cellphone.
   var ourReceivePort = ReceivePort();
@@ -99,4 +107,11 @@ Future _isolate(SendPort sendPort) async {
       }
     }
   }
+}
+
+class _StartIsolate {
+  final SendPort sendPort;
+  final OpenLibrary openLibrary;
+
+  _StartIsolate(this.sendPort, this.openLibrary);
 }
