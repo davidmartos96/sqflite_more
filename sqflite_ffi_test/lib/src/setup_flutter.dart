@@ -8,7 +8,7 @@ import 'package:sqflite_ffi_test/src/sqflite_ffi_exception.dart';
 ///
 /// Currently supporting Linux.
 void sqfliteInitAsMockMethodCallHandler() {
-  const channel = MethodChannel('com.tekartik.sqflite');
+  const channel = MethodChannel('com.davidmartos96.sqflite_sqlcipher');
 
   channel.setMockMethodCallHandler((MethodCall methodCall) async {
     try {
